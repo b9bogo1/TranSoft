@@ -3,6 +3,7 @@ from flask import (
 )
 from werkzeug.exceptions import abort
 import time
+from datetime import datetime, timedelta
 from TranSoft.auth import login_required
 from TranSoft import db
 from TranSoft.models import Reading
@@ -17,15 +18,21 @@ Request_Type = "Internal"
 
 # Define a function that returns the timestamp of the last reading request from an external source
 def last_external_request_time():
-    return Reading.query.order_by(Reading.created_at.desc()).first().last_rx
+    # query the Reading table and get the most recent record by created_at column
+    reading = Reading.query.order_by(Reading.created_at.desc()).first()
+    # check if the query returned a result
+    if reading:
+        # return the last_rx attribute of the reading object
+        return reading.last_rx
+    else:
+        # return None or some default value if no result was found
+        return None
 
 
 @bp.route('/')
 def index():
-    # Get the latest readings from the database up to the limit
-    readings = Reading.query.order_by(Reading.created_at.desc()).limit(10).all()
     # Render an HTML template that displays the readings list
-    return render_template('reading/index.html', readings=readings)
+    return render_template('reading/index.html')
 
 
 # Define a route for handling a POST request to get a reading from a sensor
@@ -47,13 +54,13 @@ def get_reading():
     last_rrs = int(time.time() * 1000000)
     # Create a new Reading object with the sensor data and the requestor data
     new_reading = Reading(trans_id=XMTER_ID,
-                          rtd_1=resistances[0], # Resistance value of the first RTD sensor
-                          rtd_2=resistances[1], # Resistance value of the second RTD sensor
-                          order_num=requestor_data["order_num"], # Order number from the requestor
-                          requestor_id=requestor_data["requestor"], # Requestor ID from the requestor
-                          temp_1=resistance_to_temperature(resistances[0]), # Temperature value of the first RTD
+                          rtd_1=resistances[0],  # Resistance value of the first RTD sensor
+                          rtd_2=resistances[1],  # Resistance value of the second RTD sensor
+                          order_num=requestor_data["order_num"],  # Order number from the requestor
+                          requestor_id=requestor_data["requestor"],  # Requestor ID from the requestor
+                          temp_1=resistance_to_temperature(resistances[0]),  # Temperature value of the first RTD
                           # sensor calculated from the resistance
-                          temp_2=resistance_to_temperature(resistances[1]), # Temperature value of the second RTD
+                          temp_2=resistance_to_temperature(resistances[1]),  # Temperature value of the second RTD
                           # sensor calculated from the resistance
                           last_rrq=last_rrq,
                           last_rrs=last_rrs,
@@ -94,10 +101,9 @@ def latest_reading_saved():
     if reading is None:
         # Return a 404 Not Found error with a message
         return jsonify({"error": "No reading found"}), 404
-    reading_dict = reading.__dict__
-    reading_dict.pop("_sa_instance_state", None)
+    reading_dict = reading.as_dict()
     # Convert the datetime object to a string using isoformat method
-    reading_dict["created_at"] = reading_dict["created_at"].isoformat()
+    reading_dict["created_at"] = reading_dict["created_at"].isoformat(timespec="microseconds")
     return jsonify(reading_dict)
 
 
@@ -110,11 +116,10 @@ def internal_reading_list():
     data = []
     # Loop through each reading object
     for reading in last_readings:
-        # Convert the row to a dictionary and remove some non-JSON serializable attributes
-        reading_dict = reading.__dict__
-        reading_dict.pop("_sa_instance_state", None)
-        # Convert the datetime object to a string using isoformat method
-        reading_dict["created_at"] = reading_dict["created_at"].isoformat()
+        # Convert the row to a dictionary using the as_dict method
+        reading_dict = reading.as_dict()
+        # Convert the datetime object to a string using isoformat method with timespec argument
+        reading_dict["created_at"] = reading_dict["created_at"].isoformat(timespec="seconds")
         # Append the reading dictionary to the data list
         data.append(reading_dict)
         # Return a JSON response with the data list
@@ -133,14 +138,38 @@ def integrity_check():
     return jsonify(data)
 
 
-# # Import threading and the transmitter_check function from TranSoft/background_processes.py
-# import threading
-# from TranSoft.background_processes import transmitter_integrity_check, handle_non_transmitted_readings
-#
-# # create and start a new thread out of route function in the blueprint
-# # threading.Thread(target=transmitter_integrity_check).start()
-# # t2 = threading.Thread(target=handle_non_transmitted_readings)
-# # t2.start()
+@bp.route('/handle-non-transmitted-readings/<int:time_range>', methods=['GET'])
+def hdl_non_transmitted_readings(time_range):
+    # get the current time
+    now = datetime.now()
+    # get the time 10 minutes ago
+    ten_minutes_ago = now - timedelta(minutes=time_range)
+    # Create an empty list to store the reading dictionaries
+    data = []
+    # query the Reading table and filter by created_at and is_data_transmitted columns
+    non_transmitted_readings = Reading.query.filter(Reading.created_at >= ten_minutes_ago) \
+        .filter(Reading.is_data_transmitted == False).all()
+    # Loop through each reading object
+    for reading in non_transmitted_readings:
+        # Convert the row to a dictionary using the as_dict method
+        reading_dict = reading.as_dict()
+        # Convert the datetime object to a string using isoformat method with timespec argument
+        reading_dict["created_at"] = reading_dict["created_at"].isoformat(timespec="microseconds")
+        # Append the reading dictionary to the data list
+        data.append(reading_dict)
+        # Return a JSON response with the data list
+    return jsonify(data)
+
+
+# Import threading and the transmitter_check function from TranSoft/background_processes.py
+import threading
+from TranSoft.background_processes import transmitter_integrity_check, handle_non_transmitted_readings
+
+# create and start a new thread out of route function in the blueprint
+t1 = threading.Thread(target=transmitter_integrity_check)
+t2 = threading.Thread(target=handle_non_transmitted_readings)
+t1.start()
+t2.start()
 #
 # # # Wait for Ctrl-C on the terminal
 # # try:

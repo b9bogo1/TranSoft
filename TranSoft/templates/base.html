@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<title>{% block title %}{% endblock %} - TranSoft</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='MDB5/css/mdb.min.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+<script type="text/javascript" src="{{ url_for('static', filename='jquery/jquery-3.6.4.min.js') }}"></script>
+<nav class="navbar navbar-light navbar-dark bg-dark">
+  <div class="container">
+    <a class="navbar-brand" href="#">
+        <span class="fw-bold fs-3 text">TranSoft</span>
+    </a>
+    <div class="justify-content-center text-white">
+      <div class="fs-2 text">BV37</div>
+    </div>
+    <ul class="justify-content-end">
+      {% if g.user %}
+        <span>{{ g.user['email'] }}</span>
+        <a class="btn btn-light ms-3" href="{{ url_for('auth.logout') }}">Log Out</a>
+      {% else %}
+        <a class="btn btn-light ms-3" href="{{ url_for('auth.register') }}">Register</a>
+        <a class="btn btn-light ms-3" href="{{ url_for('auth.login') }}">Log In</a>
+      {% endif %}
+    </ul>
+  </div>
+</nav>
+<section class="container">
+    <header class="fs-3 text py-3">
+        {% block header %}{% endblock %}
+    </header>
+    {% block content %}{% endblock %}
+</section>
+<script type="text/javascript" src="{{ url_for('static', filename='MDB5/js/mdb.min.js') }}"></script>
+</html>

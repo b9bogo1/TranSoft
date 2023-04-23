@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <div>{% block title %}Dashboard{% endblock %}</div>
+{% endblock %}
+
+{% block content %}
+<div id="dashboard">
+  <div id="readings" class="d-flex justify-content-center display-5 fw-bold p-4">Loading...</div>
+  <table id="status-table" class="table table-sm table-dark mb-4">
+    <thead>
+      <tr>
+        <th scope="col">Status</th>
+        <th scope="col">Order#</th>
+        <th scope="col">Requestor</th>
+        <th scope="col">Last RX</th>
+        <th scope="col">Last RRQ</th>
+        <th scope="col">Last RRS</th>
+        <th scope="col">Last TX</th>
+        <th scope="col">Counter</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>
+          <div id="square-box" class="status-box rounded-5"></div>
+        </th>
+        <th id="order-num-head">Load...</th>
+        <th id="requestor-id-head">Load...</th>
+        <th id="last_rx">Load...</th>
+        <th id="last_rrq">Load...</th>
+        <th id="last_rrs">Load...</th>
+        <th id="last_tx">Load...</th>
+        <th id="counter">Load...</th>
+      </tr>
+    </tbody>
+  </table>
+  <table id="reading-table" class="table table-sm table-bordered border-white table-dark">
+    <thead>
+      <tr>
+        <th scope="col">ID#</th>
+        <th scope="col">Order#</th>
+        <th scope="col">PT1000 RTD 1</th>
+        <th scope="col">Temperature 1</th>
+        <th scope="col">PT1000 RTD 2</th>
+        <th scope="col">Temperature 2</th>
+        <th scope="col">Requestor</th>
+        <th scope="col">At</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th id="id-0">Load...</th>
+        <th id="order-num-0">Load...</th>
+        <th id="rtd-1-0">Load...</th>
+        <th id="temp-1-0">Load...</th>
+        <th id="rtd-2-0">Load...</th>
+        <th id="temp-2-0">Load...</th>
+        <th id="requestor-id-0">Load...</th>
+        <th id="at-0">Load...</th>
+      </tr>
+      <tr>
+        <th id="id-1">Load...</th>
+        <th id="order-num-1">Load...</th>
+        <th id="rtd-1-1">Load...</th>
+        <th id="temp-1-1">Load...</th>
+        <th id="rtd-2-1">Load...</th>
+        <th id="temp-2-1">Load...</th>
+        <th id="requestor-id-1">Load...</th>
+        <th id="at-1">Load...</th>
+      </tr>
+      <tr>
+        <th id="id-2">Load...</th>
+        <th id="order-num-2">Load...</th>
+        <th id="rtd-1-2">Load...</th>
+        <th id="temp-1-2">Load...</th>
+        <th id="rtd-2-2">Load...</th>
+        <th id="temp-2-2">Load...</th>
+        <th id="requestor-id-2">Load...</th>
+        <th id="at-2">Load...</th>
+      </tr>
+      <tr>
+        <th id="id-3">Load...</th>
+        <th id="order-num-3">Load...</th>
+        <th id="rtd-1-3">Load...</th>
+        <th id="temp-1-3">Load...</th>
+        <th id="rtd-2-3">Load...</th>
+        <th id="temp-2-3">Load...</th>
+        <th id="requestor-id-3">Load...</th>
+        <th id="at-3">Load...</th>
+      </tr>
+      <tr>
+        <th id="id-4">Load...</th>
+        <th id="order-num-4">Load...</th>
+        <th id="rtd-1-4">Load...</th>
+        <th id="temp-1-4">Load...</th>
+        <th id="rtd-2-4">Load...</th>
+        <th id="temp-2-4">Load...</th>
+        <th id="requestor-id-4">Load...</th>
+        <th id="at-4">Load...</th>
+      </tr>
+      <tr>
+        <th id="id-5">Load...</th>
+        <th id="order-num-5">Load...</th>
+        <th id="rtd-1-5">Load...</th>
+        <th id="temp-1-5">Load...</th>
+        <th id="rtd-2-5">Load...</th>
+        <th id="temp-2-5">Load...</th>
+        <th id="requestor-id-5">Load...</th>
+        <th id="at-5">Load...</th>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<script type="text/javascript" src="{{ url_for('static', filename='reading/index.js') }}"></script>
+{% endblock %}

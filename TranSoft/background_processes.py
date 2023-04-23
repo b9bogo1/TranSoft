@@ -4,7 +4,8 @@ import time
 
 REQUEST_TYPE = "Internal"
 REQUESTOR = "Xmter-BV37"
-HANDLE_NON_TRANSMITTED_READINGS_CIRCLE_TIME = 600
+CIRCLE_TIME = 600
+QUERY_TIME = CIRCLE_TIME + 120
 
 
 def transmitter_integrity_check():
@@ -38,7 +39,7 @@ def transmitter_integrity_check():
                     response = requests.post("http://127.0.0.1:5000/get-reading", data=master_data, headers=headers)
             else:
                 # Handle non-OK status codes
-                print(f"Request failed with status code {response.status_code}")
+                print(f"Request failed with status code {integrity_check_response.status_code}")
         except requests.exceptions.RequestException as e:
             # Handle network-related errors
             print(f"Request error: {e}")
@@ -49,27 +50,24 @@ def transmitter_integrity_check():
 
 
 def handle_non_transmitted_readings():
-    # define the dictionary of parameters
-    params = {
-        "time_in_seconds": HANDLE_NON_TRANSMITTED_READINGS_CIRCLE_TIME + 60
-    }
     while True:
-        time.sleep(2)  # Sleep for 2 seconds
-        time.sleep(HANDLE_NON_TRANSMITTED_READINGS_CIRCLE_TIME)  # Sleep for 600 seconds or 10 minutes
-        print("Handle non transmitted readings every 2 minutes")
+        print("Handle non transmitted readings every 10 minutes")
         # Make a GET request to the transmitter integrity check endpoint
         try:
-            last_non_transmitted_readings = requests.get("http://127.0.0.1:5000/last_non_transmitted_readings")
+            last_non_transmitted_readings = requests.get(
+                f"http://127.0.0.1:5000/handle-non-transmitted-readings/{QUERY_TIME}"
+            )
             # Check if the response status code is OK
             if last_non_transmitted_readings.status_code == 200:
                 last_non_transmitted_readings_data = last_non_transmitted_readings.json()
                 print(last_non_transmitted_readings_data)
+            else:
+                # Handle non-OK status codes
+                print(f"Request failed with status code {last_non_transmitted_readings.status_code}")
         except requests.exceptions.RequestException as e:
             # Handle network-related errors
             print(f"Request error: {e}")
         except json.JSONDecodeError as e:
             # Handle JSON parsing errors
             print(f"JSON error: {e}")
-
-
-handle_non_transmitted_readings()
+        time.sleep(CIRCLE_TIME)  # Sleep for 660 seconds or 10 minutes

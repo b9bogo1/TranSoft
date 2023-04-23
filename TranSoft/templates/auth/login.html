@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <div class="d-flex justify-content-center pt-4">
+    <span class="fw-bold fs-1 text">TranSoft </span>
+    <span class="fs-6 text px-1">v1.1</span>
+  </div>
+  <div>{% block title %}Log In{% endblock %}</div>
+{% endblock %}
+
+{% block content %}
+  <form method="post">
+    <!-- Email input -->
+    <div class="form-outline form-white mb-4">
+      <input type="email" id="email" class="form-control" required/>
+      <label class="form-label" for="email">Email address</label>
+    </div>
+
+    <!-- Password input -->
+    <div class="form-outline form-white mb-4">
+      <input type="password" id="password" class="form-control" required/>
+      <label class="form-label" for="password">Password</label>
+    </div>
+
+    <!-- Submit button -->
+    <input class="btn btn-primary btn-block mb-4" type="submit" value="Log In">
+  </form>
+{% endblock %}

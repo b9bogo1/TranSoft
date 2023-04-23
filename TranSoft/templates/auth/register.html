@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block header %}
+<div class="d-flex justify-content-center pt-4">
+  <span class="fw-bold fs-1 text">TranSoft </span>
+  <span class="fs-6 text px-1">v1.1</span>
+</div>
+  <div>{% block title %}Register{% endblock %}</div>
+{% endblock %}
+
+{% block content %}
+  <form method="POST">
+    <!-- 2 column grid layout with text inputs for the first and last names -->
+    <div class="row mb-4">
+      <div class="col">
+        <div class="form-outline form-white">
+          <input name="firstname" type="text" id="firstname" class="form-control" />
+          <label class="form-label" for="firstname">First name</label>
+        </div>
+      </div>
+      <div class="col">
+        <div class="form-outline form-white">
+          <input name="lastname" type="text" id="lastname" class="form-control" />
+          <label class="form-label" for="lastname">Last name</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Email input -->
+    <div class="form-outline form-white mb-4">
+      <input name="email" type="email" id="email" class="form-control" />
+      <label class="form-label" for="email">Email address</label>
+    </div>
+
+    <!-- Password input -->
+    <div class="form-outline form-white mb-4">
+      <input name="password" type="password" id="password" class="form-control" />
+      <label class="form-label" for="password">Password</label>
+    </div>
+
+    <!-- Code input -->
+    <div class="form-outline form-white mb-4">
+      <input name="code" type="number" id="code" class="form-control" />
+      <label class="form-label" for="code">Provide your code</label>
+    </div>
+
+    <!-- Submit button -->
+    <input class="btn btn-primary btn-block mb-4" type="submit" value="Register">
+  </form>
+{% endblock %}

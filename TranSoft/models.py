@@ -35,3 +35,8 @@ class Reading(db.Model):
     @repr
     def __repr__(self):
         return f'<User {self.trans_id, self.id}>'
+
+    # define the as_dict method here
+    def as_dict(self):
+        # return a dictionary representation of the model object
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
