@@ -2,12 +2,15 @@ import os
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from concurrent.futures import ThreadPoolExecutor
+import atexit
 from flask_migrate import Migrate
 import threading
 
 # create extensions instances
 db = SQLAlchemy()
 migrate = Migrate()
+executor = ThreadPoolExecutor(1)
 
 from TranSoft import events
 
@@ -33,14 +36,6 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    # a simple page that says hello
-    @app.route('/hello')
-    def hello():
-        return 'Hello, World!'
-
-    # from . import db
-    # db.init_app(app)
-
     # initialize extensions
     db.init_app(app)
     migrate.init_app(app, db)
@@ -57,4 +52,13 @@ def create_app(test_config=None):
     def page_not_found(error):
         return 'Page not found', 404
 
+    from TranSoft.background_processes.integrity_check import TransmitterIntegrityCheck
+    transmitter_integrity_check_thread = TransmitterIntegrityCheck()
+    transmitter_integrity_check_thread.start()
+
+    from TranSoft.background_processes.non_transmitted import HandleNonTransmittedReadings
+    handle_non_transmitted_readings_thread = HandleNonTransmittedReadings()
+    handle_non_transmitted_readings_thread.start()
+
     return app
+

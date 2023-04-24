@@ -160,25 +160,3 @@ def hdl_non_transmitted_readings(time_range):
         # Return a JSON response with the data list
     return jsonify(data)
 
-
-# Import threading and the transmitter_check function from TranSoft/background_processes.py
-import threading
-from TranSoft.background_processes import transmitter_integrity_check, handle_non_transmitted_readings
-
-# create and start a new thread out of route function in the blueprint
-t1 = threading.Thread(target=transmitter_integrity_check)
-t2 = threading.Thread(target=handle_non_transmitted_readings)
-t1.start()
-t2.start()
-#
-# # # Wait for Ctrl-C on the terminal
-# # try:
-# #     while True:
-# #         time.sleep(0.1)
-# # except KeyboardInterrupt:
-# #     # Stop the thread by setting the event flag
-# #     print("Stopping thread...")
-# #     event.set()
-# #
-# # # Wait for the thread to finish
-# # t.join()
