@@ -17,7 +17,7 @@ Request_Type = "Internal"
 
 
 # Define a function that returns the timestamp of the last reading request from an external source
-def last_external_request_time():
+def last_request_time():
     # query the Reading table and get the most recent record by created_at column
     reading = Reading.query.order_by(Reading.created_at.desc()).first()
     # check if the query returned a result
@@ -50,6 +50,10 @@ def get_reading():
     last_rrq = int(time.time() * 1000000)
     # Call a function to get the resistance values from the sensor
     resistances = get_resistance_from_dat8014()
+    # Check if the result is a tuple of two None values
+    if resistances == (None, None):
+        # Return a 500 Internal Server Error with a message
+        return jsonify({"error": "Failed to read from the device"}), 500
     # Get the current timestamp in microseconds for the reading response event
     last_rrs = int(time.time() * 1000000)
     # Create a new Reading object with the sensor data and the requestor data
@@ -76,6 +80,7 @@ def get_reading():
     if requestor_data["request_type"] == "External":
         new_reading.is_data_transmitted = True
         Request_Type = "External"
+    Request_Type = "Internal"
     new_reading.last_tx = int(time.time() * 1000000)
     # Commit the changes to the database
     db.session.commit()
@@ -128,11 +133,11 @@ def internal_reading_list():
 
 @bp.route('/transmitter-integrity-check', methods=['GET'])
 def integrity_check():
-    # Get the last external request time in seconds
-    last_request_time = last_external_request_time() / 1000000
+    # Get the last external request time in seconds and
     # Create a dictionary with the flag value
     data = {
-        "last_request_time": last_request_time
+        "last_request_time": last_request_time() / 1000000,
+        "request_type": Request_Type
     }
     # Return a JSON response with the data dictionary
     return jsonify(data)

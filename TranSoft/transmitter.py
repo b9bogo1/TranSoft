@@ -1,35 +1,49 @@
 # Import the module
 from pymodbus.client.sync import ModbusTcpClient
-from pymodbus.payload import BinaryPayloadBuilder, BinaryPayloadDecoder
+from pymodbus.payload import BinaryPayloadDecoder
 from pymodbus.constants import Endian
 from pymodbus import mei_message
+from pymodbus.exceptions import ModbusIOException
+import logging
+
+# Configure logging
+logging.basicConfig()
+log = logging.getLogger()
+log.setLevel(logging.DEBUG)
+
+DAT8014_IP = "127.0.0.1"
+DAT8014_PORT = 5020
 
 
 # Define a function to get resistances from Dat8014 and convert them to temperature
 def get_resistance_from_dat8014():
     # Create a Modbus TCP client object with the server address and port
-    client = ModbusTcpClient('127.0.0.1', port=5020)
+    client = ModbusTcpClient(DAT8014_IP, port=DAT8014_PORT)
     # Connect to the server
     client.connect()
     # Create a request object
     request = mei_message.ReadDeviceInformationRequest(read_code=0x03)
     # Execute the request and get the response
-    response = client.execute(request)
-    # Read the first holding register of slave id 1
-    result_1 = client.read_holding_registers(0, 1)  # read one register starting from address 0
-    decoder_1 = BinaryPayloadDecoder.fromRegisters(result_1.registers, byteorder=Endian.Big, wordorder=Endian.Big)
-    value_1 = decoder_1.decode_16bit_float()
-    # value_1 = resistance_to_temperature(value_1)
-    # value_1 = format(value_1, '.3f')
-    # Read the second holding register of slave id 1
-    result_2 = client.read_holding_registers(1, 1)
-    decoder_2 = BinaryPayloadDecoder.fromRegisters(result_2.registers, byteorder=Endian.Big, wordorder=Endian.Big)
-    value_2 = decoder_2.decode_16bit_float()
-    # value_2 = resistance_to_temperature(value_2)
-    # value_2 = format(value_2, '.3f')
-    # Close the connection
-    client.close()
-    return value_1, value_2
+    try:
+        response = client.execute(request)
+        # Read the first holding register of slave id 1
+        result_1 = client.read_holding_registers(0, 1)  # read one register starting from address 0
+        decoder_1 = BinaryPayloadDecoder.fromRegisters(result_1.registers, byteorder=Endian.Big, wordorder=Endian.Big)
+        value_1 = decoder_1.decode_16bit_float()
+        # Read the second holding register of slave id 1
+        result_2 = client.read_holding_registers(1, 1)
+        decoder_2 = BinaryPayloadDecoder.fromRegisters(result_2.registers, byteorder=Endian.Big, wordorder=Endian.Big)
+        value_2 = decoder_2.decode_16bit_float()
+        # Return the values
+        return value_1, value_2
+    except ModbusIOException as e:
+        # Handle the exception
+        # log.error("Modbus Error: %s", e)
+        print("Modbus Error: [Connection] Failed to connect[ModbusTcpClient(127.0.0.1:5020)]")
+        return None, None
+    finally:
+        # Close the connection
+        client.close()
 
 
 # Define a function to calculate temperature from resistance
