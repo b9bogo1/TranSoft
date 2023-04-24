@@ -13,6 +13,7 @@ REQUEST_TYPE = "Internal"
 REQUESTOR = "Xmter-BV37"
 TRANSMITTER_INTEGRITY_CHECK_URL = "http://127.0.0.1:5000/transmitter-integrity-check"
 GET_LAST_READING_URL = "http://127.0.0.1:5000/get-latest-reading-saved"
+GET_READINGS_URL = "http://127.0.0.1:5000/get-reading"
 
 
 class TransmitterIntegrityCheck(Thread):
@@ -47,7 +48,7 @@ class TransmitterIntegrityCheck(Thread):
                             "request_type": REQUEST_TYPE
                         })
                         headers = {"Content-Type": "application/json"}
-                        response = requests.post("http://127.0.0.1:5000/get-reading", data=master_data, headers=headers)
+                        response = requests.post(GET_READINGS_URL, data=master_data, headers=headers)
                         if response.status_code is 500:
                             print("DAT8014 not operating as expected")
                         print("Auto saving activated internally")
