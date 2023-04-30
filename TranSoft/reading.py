@@ -152,8 +152,11 @@ def hdl_non_transmitted_readings(time_range):
     # Create an empty list to store the reading dictionaries
     data = []
     # query the Reading table and filter by created_at and is_data_transmitted columns
-    non_transmitted_readings = Reading.query.filter(Reading.created_at >= ten_minutes_ago) \
-        .filter(Reading.is_data_transmitted == False).all()
+    # non_transmitted_readings = Reading.query.filter(Reading.created_at >= ten_minutes_ago) \
+    #     .filter(Reading.is_data_transmitted == False).all()
+    non_transmitted_readings = db.session.query(Reading) \
+        .filter(Reading.created_at >= ten_minutes_ago, Reading.is_data_transmitted == False).all()
+    # print(non_transmitted_readings)
     # Loop through each reading object
     for reading in non_transmitted_readings:
         # Convert the row to a dictionary using the as_dict method

@@ -1,8 +1,11 @@
+# from datetime import datetime, timedelta
 from threading import Thread
 import time
 import requests
 import json
-from flask import Blueprint
+
+from TranSoft import db
+from TranSoft.models import Reading
 
 # Define some constants
 QUERY_TIME = 12  # minutes

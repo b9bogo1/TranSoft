@@ -1,11 +1,10 @@
-from sqlalchemy import DateTime, event
-from sqlalchemy.orm import mapper # import mapper from sqlalchemy.orm
-from sqlalchemy.orm import class_mapper # import class_mapper from sqlalchemy.orm
+from sqlalchemy import event
 from TranSoft.models import User, Reading
 from TranSoft import db
 
 READING_MAX_DATA = 691199
 USER_MAX_DATA = 5
+
 
 @event.listens_for(User, "before_insert")
 def delete_oldest_entries(mapper, connection, target):

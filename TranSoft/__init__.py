@@ -1,13 +1,11 @@
 import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from concurrent.futures import ThreadPoolExecutor
 from flask_migrate import Migrate
 
 # create extensions instances
 db = SQLAlchemy()  # create a SQLAlchemy object to handle database operations
 migrate = Migrate()  # create a Migrate object to handle database migrations
-executor = ThreadPoolExecutor(1)  # create a ThreadPoolExecutor object to run tasks in a separate thread
 from TranSoft import events  # import the events module from the TranSoft package
 
 
