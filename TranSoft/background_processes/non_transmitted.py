@@ -3,13 +3,22 @@ from threading import Thread
 import time
 import requests
 import json
+from TranSoft.local_configs import PRODUCTION
 
-NODE = {
-    "ip": "127.0.0.1",
-    "hostname": "Xmter-5",
-    "site": "BV05",
-    "PORT": "60205"
-}
+if not PRODUCTION:
+    NODE = {
+        "ip": "127.0.0.1",
+        "hostname": "Xmter-5",
+        "site": "BV05",
+        "PORT": "60205"
+    }
+else:
+    NODE = {
+        "ip": "10.0.0.5",
+        "hostname": "Xmter-5",
+        "site": "BV05",
+        "PORT": "80"
+    }
 
 # Define some constants
 QUERY_TIME = 12  # minutes
@@ -38,7 +47,19 @@ class HandleNonTransmittedReadings(Thread):
                 # Check if the response status code is OK
                 if last_non_transmitted_readings.status_code == 200:
                     last_non_transmitted_readings_data = last_non_transmitted_readings.json()
-                    print(last_non_transmitted_readings_data)
+                    if len(last_non_transmitted_readings_data) >= 1:
+                        global master_node
+                        master_nodes = requests.get(GET_MASTER_NODES_URL).json()
+                        for node in master_nodes:
+                            if node['power'] == len(master_nodes) - 1:
+                                master_node = node
+                        url = f"http://{master_node['ip']}:{master_node['port']}/save-unsaved-readings"
+                        for reading in last_non_transmitted_readings_data:
+                            reading_data = json.dumps(reading)
+                            headers = {"Content-Type": "application/json"}
+                            sent_non_transmitted_data = requests.post(url, data=reading_data, headers=headers)
+                            if not sent_non_transmitted_data.status_code == 200:
+                                print("Saving non Saved reading failed...")
                 else:
                     # Handle non-OK status codes
                     print(f"Request failed: last_non_transmitted_readings")

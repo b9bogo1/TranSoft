@@ -6,14 +6,23 @@ import requests
 import uuid
 import time
 import json
+from TranSoft.local_configs import PRODUCTION
 from flask import Blueprint
 
-NODE = {
-    "ip": "127.0.0.1",
-    "hostname": "Xmter-5",
-    "site": "BV05",
-    "PORT": "60205"
-}
+if not PRODUCTION:
+    NODE = {
+        "ip": "127.0.0.1",
+        "hostname": "Xmter-5",
+        "site": "BV05",
+        "PORT": "60205"
+    }
+else:
+    NODE = {
+        "ip": "10.0.0.5",
+        "hostname": "Xmter-5",
+        "site": "BV05",
+        "PORT": "80"
+    }
 
 # Define some constants
 REQUEST_TYPE = "Internal"
