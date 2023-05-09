@@ -8,12 +8,18 @@ import time
 import json
 from flask import Blueprint
 
+NODE = {
+    "ip": "127.0.0.1",
+    "hostname": "Xmter-5",
+    "site": "BV05",
+    "PORT": "60205"
+}
+
 # Define some constants
 REQUEST_TYPE = "Internal"
-REQUESTOR = "Xmter-BV37"
-TRANSMITTER_INTEGRITY_CHECK_URL = "http://127.0.0.1:5000/transmitter-integrity-check"
-GET_LAST_READING_URL = "http://127.0.0.1:5000/get-latest-reading-saved"
-GET_READINGS_URL = "http://127.0.0.1:5000/get-reading"
+TRANSMITTER_INTEGRITY_CHECK_URL = f"http://{NODE['ip']}:{NODE['PORT']}/transmitter-integrity-check"
+GET_LAST_READING_URL = f"http://{NODE['ip']}:{NODE['PORT']}/get-latest-reading-saved"
+GET_READINGS_URL = f"http://{NODE['ip']}:{NODE['PORT']}/get-reading"
 
 
 class TransmitterIntegrityCheck(Thread):
@@ -43,7 +49,7 @@ class TransmitterIntegrityCheck(Thread):
                     is_data_transfer_rate_ok = current_time < last_request_time + 600
                     if not is_data_transfer_rate_ok or last_saved_data["is_data_transmitted"] is False:
                         master_data = json.dumps({
-                            "requestor": REQUESTOR,
+                            "requestor": NODE['hostname'],
                             "order_num": int(time.time() * 1000000),
                             "request_type": REQUEST_TYPE
                         })

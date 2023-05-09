@@ -8,12 +8,22 @@ from TranSoft.auth import login_required
 from TranSoft import db
 from TranSoft.models import Reading
 from TranSoft.transmitter import get_resistance_from_dat8014, resistance_to_temperature
+from TranSoft.local_configs import PRODUCTION
 
 bp = Blueprint('reading', __name__)
 
 XMTER_ID = "Xmter-BV5"
 MAX_INTERNAL_LIMIT = 6
 Request_Type = "Internal"
+
+if not PRODUCTION:
+    NODE_IP = "127.0.0.1:60205"
+else:
+    NODE_IP = "10.0.0.5:80"
+
+# Create a dictionary of empty lists for different types of nodes
+SYSTEM_NODES = {key: [] for key in
+                ["master_list", "transmitter_list", "data_server_list", "maintenance_pc_list", "interface_list"]}
 
 
 # Define a function that returns the timestamp of the last reading request from an external source
@@ -30,6 +40,7 @@ def last_request_time():
 
 
 @bp.route('/')
+@login_required
 def index():
     # Render an HTML template that displays the readings list
     return render_template('reading/index.html')
@@ -131,6 +142,20 @@ def internal_reading_list():
     return jsonify(data)
 
 
+@bp.route('/system-data-update', methods=["GET", "POST"])
+def system_data_update():
+    if request.method == 'GET':
+        return jsonify(SYSTEM_NODES["master_list"])
+    # Get the JSON data from the request
+    node_list_data = request.json
+    SYSTEM_NODES["master_list"] = node_list_data["master_list"]
+    SYSTEM_NODES["transmitter_list"] = node_list_data["transmitter_list"]
+    SYSTEM_NODES["data_server_list"] = node_list_data["data_server_list"]
+    SYSTEM_NODES["maintenance_pc_list"] = node_list_data["maintenance_pc_list"]
+    SYSTEM_NODES["interface_list"] = node_list_data["interface_list"]
+    return NODE_IP
+
+
 @bp.route('/transmitter-integrity-check', methods=['GET'])
 def integrity_check():
     # Get the last external request time in seconds and
@@ -152,11 +177,8 @@ def hdl_non_transmitted_readings(time_range):
     # Create an empty list to store the reading dictionaries
     data = []
     # query the Reading table and filter by created_at and is_data_transmitted columns
-    # non_transmitted_readings = Reading.query.filter(Reading.created_at >= ten_minutes_ago) \
-    #     .filter(Reading.is_data_transmitted == False).all()
     non_transmitted_readings = db.session.query(Reading) \
         .filter(Reading.created_at >= ten_minutes_ago, Reading.is_data_transmitted == False).all()
-    # print(non_transmitted_readings)
     # Loop through each reading object
     for reading in non_transmitted_readings:
         # Convert the row to a dictionary using the as_dict method
@@ -167,4 +189,13 @@ def hdl_non_transmitted_readings(time_range):
         data.append(reading_dict)
         # Return a JSON response with the data list
     return jsonify(data)
+
+
+@bp.before_app_request
+def load_system_nodes():
+    for key in SYSTEM_NODES:
+        if SYSTEM_NODES[key] == []:
+            g.system_nodes = {}
+        else:
+            g.system_nodes = SYSTEM_NODES
 

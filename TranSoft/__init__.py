@@ -2,6 +2,7 @@ import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from TranSoft.local_configs import PRODUCTION, DATABASE_PASSWORD, APP_SECRET_KEY
 
 # create extensions instances
 db = SQLAlchemy()  # create a SQLAlchemy object to handle database operations
@@ -9,14 +10,21 @@ migrate = Migrate()  # create a Migrate object to handle database migrations
 from TranSoft import events  # import the events module from the TranSoft package
 
 
+if not PRODUCTION:
+    SERVER_NAME = "127.0.0.1:60205"
+else:
+    SERVER_NAME = "10.0.0.5:80"
+
+
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)  # create a Flask app object with relative instance path
     app.config.from_mapping(
-        SECRET_KEY='dev',  # set the secret key for the app
+        SECRET_KEY=APP_SECRET_KEY,  # set the secret key for the app
         SQLALCHEMY_DATABASE_URI='sqlite:///' + os.path.join(app.instance_path, 'TranSoft.sqlite'),
         # set the database URI for the app
     )
+    app.config["SERVER_NAME"] = SERVER_NAME
     if test_config is None:
         # load the instance config, if it exists, when not testing
         app.config.from_pyfile('config.py', silent=True)  # load the config file from the instance folder

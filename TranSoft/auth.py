@@ -62,15 +62,14 @@ def login():
         password = request.form['password']
         error = None
         user = User.query.filter_by(email=email).first()
-
         if user is None:
             error = 'Incorrect email.'
-        elif not check_password_hash(user['password'], password):
+        elif not check_password_hash(user.password, password):
             error = 'Incorrect password.'
 
         if error is None:
             session.clear()
-            session['user_id'] = user['id']
+            session['user_id'] = user.id
             return redirect(url_for('index'))
 
         flash(error)
@@ -87,6 +86,8 @@ def logout():
 @bp.before_app_request
 def load_logged_in_user():
     user_id = session.get('user_id')
+    from TranSoft.reading import XMTER_ID
+    g.nodeId = XMTER_ID
 
     if user_id is None:
         g.user = None
@@ -101,5 +102,4 @@ def login_required(view):
             return redirect(url_for('auth.login'))
 
         return view(**kwargs)
-
     return wrapped_view

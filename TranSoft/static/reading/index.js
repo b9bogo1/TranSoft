@@ -65,7 +65,7 @@ function get_data_from_server() {
   // Send an AJAX GET request to the Flask view function
   $.ajax({
     type: "GET",
-    url: "http://127.0.0.1:5000/internal-reading-list",
+    url: "http://127.0.0.1:60205/internal-reading-list",
     success: function(readings) {
       $("#readings").html(`${readings[0].temp_1.toFixed(3)} °C | ${readings[0].temp_2.toFixed(3)} °C`);
       // Use a loop to call the html_data_binding function for each reading in the array

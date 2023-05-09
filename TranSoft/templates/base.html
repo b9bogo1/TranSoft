@@ -10,11 +10,11 @@
         <span class="fw-bold fs-3 text">TranSoft</span>
     </a>
     <div class="justify-content-center text-white">
-      <div class="fs-2 text">BV37</div>
+      <div class="fs-2 text">{{ g.nodeId }}</div>
     </div>
     <ul class="justify-content-end">
       {% if g.user %}
-        <span>{{ g.user['email'] }}</span>
+        <span>{{ g.user['lastname'] }}, {{ g.user['firstname'] }}</span>
         <a class="btn btn-light ms-3" href="{{ url_for('auth.logout') }}">Log Out</a>
       {% else %}
         <a class="btn btn-light ms-3" href="{{ url_for('auth.register') }}">Register</a>

@@ -7,18 +7,21 @@ from pymodbus.exceptions import ModbusIOException
 import logging
 
 # Configure logging
-logging.basicConfig()
-log = logging.getLogger()
-log.setLevel(logging.DEBUG)
+# logging.basicConfig()
+# log = logging.getLogger()
+# log.setLevel(logging.DEBUG)
 
-DAT8014_IP = "127.0.0.1"
-DAT8014_PORT = 5020
+DAT8014_NODE = {
+    "ip": "127.0.0.1",
+    "site": "BV05",
+    "port": 60805
+}
 
 
 # Define a function to get resistances from Dat8014 and convert them to temperature
 def get_resistance_from_dat8014():
     # Create a Modbus TCP client object with the server address and port
-    client = ModbusTcpClient(DAT8014_IP, port=DAT8014_PORT)
+    client = ModbusTcpClient(DAT8014_NODE['ip'], port=DAT8014_NODE['port'])
     # Connect to the server
     client.connect()
     # Create a request object
@@ -39,7 +42,7 @@ def get_resistance_from_dat8014():
     except ModbusIOException as e:
         # Handle the exception
         # log.error("Modbus Error: %s", e)
-        print("Modbus Error: [Connection] Failed to connect[ModbusTcpClient(127.0.0.1:5020)]")
+        print(f"[Connection] Failed to connect[ModbusTcpClient({DAT8014_NODE['ip']}:{DAT8014_NODE['port']})]")
         return None, None
     finally:
         # Close the connection

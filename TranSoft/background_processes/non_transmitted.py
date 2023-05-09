@@ -4,13 +4,18 @@ import time
 import requests
 import json
 
-from TranSoft import db
-from TranSoft.models import Reading
+NODE = {
+    "ip": "127.0.0.1",
+    "hostname": "Xmter-5",
+    "site": "BV05",
+    "PORT": "60205"
+}
 
 # Define some constants
 QUERY_TIME = 12  # minutes
 CIRCLE_TIME = 10  # seconds
-NON_TRANSMITTED_READINGS_URL = "http://127.0.0.1:5000/handle-non-transmitted-readings"
+NON_TRANSMITTED_READINGS_URL = f"http://{NODE['ip']}:{NODE['PORT']}/handle-non-transmitted-readings"
+GET_MASTER_NODES_URL = f"http://{NODE['ip']}:{NODE['PORT']}/system-data-update"
 
 
 class HandleNonTransmittedReadings(Thread):
@@ -19,10 +24,14 @@ class HandleNonTransmittedReadings(Thread):
         self.daemon = True
 
     def run(self):
+        global MASTER_NODE_LIST
         while True:
-            print("Handle non transmitted readings every 10 minutes")
+            print("HandleNonTransmittedReadings(Thread) running")
             # Make a GET request to the transmitter integrity check endpoint
             try:
+                master_node_list = requests.get(GET_MASTER_NODES_URL)
+                if master_node_list.status_code == 200:
+                    MASTER_NODE_LIST = master_node_list.json()
                 last_non_transmitted_readings = requests.get(
                     f"{NON_TRANSMITTED_READINGS_URL}/{QUERY_TIME}"
                 )
@@ -32,11 +41,11 @@ class HandleNonTransmittedReadings(Thread):
                     print(last_non_transmitted_readings_data)
                 else:
                     # Handle non-OK status codes
-                    print(f"Request failed with status code {last_non_transmitted_readings.status_code}")
+                    print(f"Request failed: last_non_transmitted_readings")
             except requests.exceptions.RequestException as e:
                 # Handle network-related errors
-                print(f"Request error: {e}")
+                print(f"RequestException error: HandleNonTransmittedReadings(Thread) while loop")
             except json.JSONDecodeError as e:
                 # Handle JSON parsing errors
-                print(f"JSON error: {e}")
+                print(f"JSON error: HandleNonTransmittedReadings(Thread) while loop")
             time.sleep(CIRCLE_TIME)
