@@ -34,7 +34,7 @@ class TransmitterIntegrityCheck(Thread):
                     last_saved_data = latest_reading_saved_response.json()
                     # Get the last request time from the data
                     # last_request_time = integrity_check_data["last_request_time"]
-                    if last_saved_data["error"]:
+                    if not last_saved_data:
                         last_request_time = 0
                     last_request_time = last_saved_data["last_rx"] / 1000000
                     # Get the current time in seconds
