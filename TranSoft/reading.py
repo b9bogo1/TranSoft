@@ -163,10 +163,13 @@ def system_data_update():
 
 @bp.route('/transmitter-integrity-check', methods=['GET'])
 def integrity_check():
+    lst_request_time = 0
     # Get the last external request time in seconds and
     # Create a dictionary with the flag value
+    if last_request_time():
+        lst_request_time = last_request_time()
     data = {
-        "last_request_time": last_request_time() / 1000000,
+        "last_request_time": lst_request_time / 1000000,
         "request_type": Request_Type
     }
     # Return a JSON response with the data dictionary
