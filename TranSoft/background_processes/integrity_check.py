@@ -20,6 +20,7 @@ class TransmitterIntegrityCheck(Thread):
         self.daemon = True
 
     def run(self):
+        global last_request_time
         while True:
             print(f"Transmitter Integrity check enable every {SLEEP_TIME} seconds")
             # Make a GET request to the transmitter integrity check endpoint
@@ -33,6 +34,8 @@ class TransmitterIntegrityCheck(Thread):
                     last_saved_data = latest_reading_saved_response.json()
                     # Get the last request time from the data
                     # last_request_time = integrity_check_data["last_request_time"]
+                    if not last_saved_data["last_rx"]:
+                        last_request_time = 0
                     last_request_time = last_saved_data["last_rx"] / 1000000
                     # Get the current time in seconds
                     current_time = time.time()
