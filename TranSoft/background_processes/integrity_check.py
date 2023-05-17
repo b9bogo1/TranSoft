@@ -52,7 +52,7 @@ class TransmitterIntegrityCheck(Thread):
                         print("Auto saving activated internally")
                 else:
                     # Handle non-OK status codes
-                    print(f"Request failed with status code {response.status_code}")
+                    print("integrity_check_response or latest_reading_saved_response request failed")
             except requests.exceptions.RequestException as e:
                 # Handle network-related errors
                 print(f"Request error: {e}")
