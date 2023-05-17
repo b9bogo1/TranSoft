@@ -36,7 +36,8 @@ class TransmitterIntegrityCheck(Thread):
                     # last_request_time = integrity_check_data["last_request_time"]
                     if not last_saved_data:
                         last_request_time = 0
-                    last_request_time = last_saved_data["last_rx"] / 1000000
+                    else:
+                        last_request_time = last_saved_data["last_rx"] / 1000000
                     # Get the current time in seconds
                     current_time = time.time()
                     # Calculate the flag for the data transfer rate by comparing the current time with the last
