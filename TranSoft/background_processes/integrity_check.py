@@ -47,7 +47,7 @@ class TransmitterIntegrityCheck(Thread):
                         })
                         headers = {"Content-Type": "application/json"}
                         response = requests.post(GET_READINGS_URL, data=master_data, headers=headers)
-                        if response.status_code is 500:
+                        if response.status_code == 500:
                             print("DAT8014 not operating as expected")
                         print("Auto saving activated internally")
                 else:
