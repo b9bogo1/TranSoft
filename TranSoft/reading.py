@@ -8,18 +8,17 @@ from TranSoft.auth import login_required
 from TranSoft import db
 from TranSoft.models import Reading
 from TranSoft.transmitter import get_resistance_from_dat8014, resistance_to_temperature
-from TranSoft.local_configs import PRODUCTION
+from TranSoft.configs_local import PRODUCTION, get_node
 
 bp = Blueprint('reading', __name__)
 
-XMTER_ID = "Xmter-BV5"
+NODE = get_node()
+
+XMTER_ID = NODE['hostname']
 MAX_INTERNAL_LIMIT = 6
 Request_Type = "Internal"
 
-if not PRODUCTION:
-    NODE_IP = "127.0.0.1:60205"
-else:
-    NODE_IP = "10.0.0.5:80"
+NODE_IP = f"{NODE['ip']}:{NODE['port']}"
 
 # Create a dictionary of empty lists for different types of nodes
 SYSTEM_NODES = {key: [] for key in
@@ -49,6 +48,7 @@ def index():
 # Define a route for handling a POST request to get a reading from a sensor
 @bp.route('/get-reading', methods=['POST'])
 def get_reading():
+    global resistances
     # Get the current timestamp in microseconds
     last_rx = int(time.time() * 1000000)
     # Check if the request is a JSON request
@@ -60,7 +60,12 @@ def get_reading():
     # Get the current timestamp in microseconds for the reading request event
     last_rrq = int(time.time() * 1000000)
     # Call a function to get the resistance values from the sensor
-    resistances = get_resistance_from_dat8014()
+    try:
+        resistances = get_resistance_from_dat8014()
+    except Exception as e:
+        resistances = (None, None)
+        # do something with e
+        print("Error occurred while requesting resistances: Line 68 in reading.py")
     # Check if the result is a tuple of two None values
     if resistances == (None, None):
         # Return a 500 Internal Server Error with a message

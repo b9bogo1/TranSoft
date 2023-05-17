@@ -1,30 +1,16 @@
-# from datetime import datetime, timedelta
 from threading import Thread
 import time
 import requests
 import json
-from TranSoft.local_configs import PRODUCTION
+from TranSoft.configs_local import get_node
 
-if not PRODUCTION:
-    NODE = {
-        "ip": "127.0.0.1",
-        "hostname": "Xmter-5",
-        "site": "BV05",
-        "PORT": "60205"
-    }
-else:
-    NODE = {
-        "ip": "10.0.0.5",
-        "hostname": "Xmter-5",
-        "site": "BV05",
-        "PORT": "80"
-    }
+NODE = get_node()
 
 # Define some constants
 QUERY_TIME = 12  # minutes
 CIRCLE_TIME = 10  # seconds
-NON_TRANSMITTED_READINGS_URL = f"http://{NODE['ip']}:{NODE['PORT']}/handle-non-transmitted-readings"
-GET_MASTER_NODES_URL = f"http://{NODE['ip']}:{NODE['PORT']}/system-data-update"
+NON_TRANSMITTED_READINGS_URL = f"http://{NODE['ip']}:{NODE['port']}/handle-non-transmitted-readings"
+GET_MASTER_NODES_URL = f"http://{NODE['ip']}:{NODE['port']}/system-data-update"
 
 
 class HandleNonTransmittedReadings(Thread):

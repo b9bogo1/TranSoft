@@ -1,34 +1,17 @@
 from threading import Thread
-from flask import current_app
-from TranSoft import db
-from TranSoft.models import Reading
 import requests
-import uuid
 import time
 import json
-from TranSoft.local_configs import PRODUCTION
-from flask import Blueprint
+from TranSoft.configs_local import get_node
 
-if not PRODUCTION:
-    NODE = {
-        "ip": "127.0.0.1",
-        "hostname": "Xmter-5",
-        "site": "BV05",
-        "PORT": "60205"
-    }
-else:
-    NODE = {
-        "ip": "10.0.0.5",
-        "hostname": "Xmter-5",
-        "site": "BV05",
-        "PORT": "80"
-    }
+NODE = get_node()
+SLEEP_TIME = 5  # In seconds
 
 # Define some constants
 REQUEST_TYPE = "Internal"
-TRANSMITTER_INTEGRITY_CHECK_URL = f"http://{NODE['ip']}:{NODE['PORT']}/transmitter-integrity-check"
-GET_LAST_READING_URL = f"http://{NODE['ip']}:{NODE['PORT']}/get-latest-reading-saved"
-GET_READINGS_URL = f"http://{NODE['ip']}:{NODE['PORT']}/get-reading"
+TRANSMITTER_INTEGRITY_CHECK_URL = f"http://{NODE['ip']}:{NODE['port']}/transmitter-integrity-check"
+GET_LAST_READING_URL = f"http://{NODE['ip']}:{NODE['port']}/get-latest-reading-saved"
+GET_READINGS_URL = f"http://{NODE['ip']}:{NODE['port']}/get-reading"
 
 
 class TransmitterIntegrityCheck(Thread):
@@ -76,4 +59,4 @@ class TransmitterIntegrityCheck(Thread):
             except json.JSONDecodeError as e:
                 # Handle JSON parsing errors
                 print(f"JSON error: {e}")
-            time.sleep(1)
+            time.sleep(SLEEP_TIME)

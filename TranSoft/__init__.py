@@ -2,18 +2,16 @@ import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from TranSoft.local_configs import PRODUCTION, DATABASE_PASSWORD, APP_SECRET_KEY
+from TranSoft.configs_local import PRODUCTION, DATABASE_PASSWORD, APP_SECRET_KEY, get_node
 
 # create extensions instances
 db = SQLAlchemy()  # create a SQLAlchemy object to handle database operations
 migrate = Migrate()  # create a Migrate object to handle database migrations
 from TranSoft import events  # import the events module from the TranSoft package
 
+NODE = get_node()
 
-if not PRODUCTION:
-    SERVER_NAME = "127.0.0.1:60205"
-else:
-    SERVER_NAME = "10.0.0.5:80"
+SERVER_NAME = f"{NODE['ip']}:{NODE['port']}"
 
 
 def create_app(test_config=None):

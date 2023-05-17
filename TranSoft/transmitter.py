@@ -1,21 +1,12 @@
-# Import the module
 from pymodbus.client.sync import ModbusTcpClient
 from pymodbus.payload import BinaryPayloadDecoder
 from pymodbus.constants import Endian
 from pymodbus import mei_message
 from pymodbus.exceptions import ModbusIOException
-import logging
+from TranSoft.configs_local import get_dat8014_node
 
-# Configure logging
-# logging.basicConfig()
-# log = logging.getLogger()
-# log.setLevel(logging.DEBUG)
 
-DAT8014_NODE = {
-    "ip": "127.0.0.1",
-    "site": "BV05",
-    "port": 60805
-}
+DAT8014_NODE = get_dat8014_node()
 
 
 # Define a function to get resistances from Dat8014 and convert them to temperature
