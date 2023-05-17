@@ -21,7 +21,7 @@ class TransmitterIntegrityCheck(Thread):
 
     def run(self):
         while True:
-            print("Transmitter Integrity check enable every 5 seconds")
+            print(f"Transmitter Integrity check enable every {SLEEP_TIME} seconds")
             # Make a GET request to the transmitter integrity check endpoint
             try:
                 integrity_check_response = requests.get(TRANSMITTER_INTEGRITY_CHECK_URL)

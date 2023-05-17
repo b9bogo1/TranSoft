@@ -21,7 +21,7 @@ class HandleNonTransmittedReadings(Thread):
     def run(self):
         global MASTER_NODE_LIST
         while True:
-            print("HandleNonTransmittedReadings(Thread) running")
+            print(f"HandleNonTransmittedReadings(Thread) running every {CIRCLE_TIME} seconds")
             # Make a GET request to the transmitter integrity check endpoint
             try:
                 master_node_list = requests.get(GET_MASTER_NODES_URL)
