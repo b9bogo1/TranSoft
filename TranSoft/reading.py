@@ -121,7 +121,7 @@ def latest_reading_saved():
     reading = Reading.query.order_by(Reading.created_at.desc()).first()
     if reading is None:
         # Return a 404 Not Found error with a message
-        return jsonify({"error": "No reading found"}), 404
+        return jsonify({"error": "No reading found"})
     reading_dict = reading.as_dict()
     # Convert the datetime object to a string using isoformat method
     reading_dict["created_at"] = reading_dict["created_at"].isoformat(timespec="microseconds")
